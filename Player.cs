@@ -36,13 +36,13 @@ namespace PokemonGame
             UpdateAnimation();
         }
 
-        public override void Draw(Graphics g)
+        public void Draw(Graphics g, Point screenPosition)
         {
             int frameWidth = spriteSheet.Width / totalFrames;
             int frameHeight = spriteSheet.Height / 4; // Assuming 4 rows for 4 directions
 
             Rectangle sourceRect = new Rectangle(currentFrame * frameWidth, (int)Direction * frameHeight, frameWidth, frameHeight);
-            Rectangle destRect = new Rectangle(Position.X, Position.Y, frameWidth, frameHeight);
+            Rectangle destRect = new Rectangle(screenPosition.X, screenPosition.Y, frameWidth, frameHeight);
 
             g.DrawImage(spriteSheet, destRect, sourceRect, GraphicsUnit.Pixel);
         }

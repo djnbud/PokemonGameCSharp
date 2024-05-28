@@ -23,7 +23,7 @@ namespace PokemonGame.Panels
 
         private void InitializeComponents()
         {
-            this.Size = new Size(800, 600); // Adjust size as needed
+            this.Size = new Size(800, 450); // Adjust size as needed
             this.BackColor = Color.Black;
 
             storyPictureBox = new PictureBox();

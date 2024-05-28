@@ -8,6 +8,7 @@ namespace PokemonGame.Panels
     {
         private Player player;
         private Timer gameTimer;
+        private Point screenCenter;
         //private DateTime lastAnimationTime;
 
         public GamePanel()
@@ -18,12 +19,14 @@ namespace PokemonGame.Panels
 
         private void InitializeGame()
         {
-            this.Size = new Size(800, 600); // Adjust size as needed
+            this.Size = new Size(800, 450); // Adjust size as needed
             this.BackColor = Color.Green;
 
             //playerSprite = new Sprite("Assets/player/player_spritesheet.png", 48, 68, 4, 5); // Adjust as needed
             player = new Player();
-            player.Position = new Point((this.Width - player.FrameWidth) / 2, (this.Height - player.FrameHeight) / 2);
+            player.Position = new Point(0, 0);
+
+            screenCenter = new Point((this.Width - player.FrameWidth) / 2, (this.Height - player.FrameHeight) / 2);
 
             gameTimer = new Timer();
             gameTimer.Interval = 16; // ~60 FPS
@@ -36,14 +39,6 @@ namespace PokemonGame.Panels
         private void GameTimer_Tick(object sender, EventArgs e)
         {
             player.Update();
-            // Update animation frame
-            /*if ((DateTime.Now - lastAnimationTime).TotalMilliseconds > animationSpeed)
-            {
-                player.UpdateAnimation();
-
-                lastAnimationTime = DateTime.Now;
-            }*/
-
             Invalidate(); // Request a redraw of the panel
         }
 
@@ -95,7 +90,20 @@ namespace PokemonGame.Panels
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            player.Draw(e.Graphics);
+
+            Graphics g = e.Graphics;
+
+            // Calculate the player's screen position
+            Point playerScreenPos = screenCenter;
+
+            // Draw the player
+            player.Draw(g, playerScreenPos);
+
+            // Draw other game elements here, adjusting their position relative to the player's world position
+            // For example:
+            // Point enemyScreenPos = new Point(enemy.WorldPosition.X - player.Position.X + screenCenter.X,
+            //                                  enemy.WorldPosition.Y - player.Position.Y + screenCenter.Y);
+            // enemy.Draw(g, enemyScreenPos);
         }
     }
 }
