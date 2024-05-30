@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "d:\\PokemonGameCSharp\\PokemonGame.csproj": {}
+    "D:\\PokemonGameCSharp\\PokemonGame.csproj": {}
   },
   "projects": {
-    "d:\\PokemonGameCSharp\\PokemonGame.csproj": {
+    "D:\\PokemonGameCSharp\\PokemonGame.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "d:\\PokemonGameCSharp\\PokemonGame.csproj",
+        "projectUniqueName": "D:\\PokemonGameCSharp\\PokemonGame.csproj",
         "projectName": "PokemonGame",
-        "projectPath": "d:\\PokemonGameCSharp\\PokemonGame.csproj",
+        "projectPath": "D:\\PokemonGameCSharp\\PokemonGame.csproj",
         "packagesPath": "C:\\Users\\David Norwood\\.nuget\\packages\\",
-        "outputPath": "d:\\PokemonGameCSharp\\obj\\",
+        "outputPath": "D:\\PokemonGameCSharp\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",

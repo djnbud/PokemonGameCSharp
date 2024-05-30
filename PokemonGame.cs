@@ -184,7 +184,7 @@ namespace PokemonGame
             // Define the story parts
             var storyParts = new List<(string text, Image image)>
             {
-            ("Welcome, " + playerName + "!", Image.FromFile("Assets/player.png")),
+                ("Welcome, " + playerName + "!", Image.FromFile("Assets/player.png")),
                 ("This is the beginning of your adventure...", Image.FromFile("Assets/pokeball.png")),
                 ("You will face many challenges and meet many Pokémon.", Image.FromFile("Assets/PokedexEmby.png")),
                 ("Prepare yourself for an unforgettable journey!", Image.FromFile("Assets/player.png"))

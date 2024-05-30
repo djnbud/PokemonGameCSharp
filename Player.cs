@@ -47,13 +47,15 @@ namespace PokemonGame
         private bool IsCollision(Point position)
         {
             int playerWidth = FrameWidth; // Full width of the player
-            int playerHeight = FrameHeight / 3; // Only consider the bottom half of the player
+            int playerHeight = FrameHeight; // Only consider the bottom half of the player
+            int playerCenterX = position.X + playerWidth / 2; // Center X coordinate of the player
+            int playerCenterY = position.Y + playerHeight / 2;    
 
-            int tileX = (position.X + playerWidth) / 48;
-            int tileY = (position.Y + playerHeight * 2) / 48;
+            int tileX = playerCenterX / 48;
+            int tileY = playerCenterY / 48;
 
             // Check if any part of the player's bounds intersects with a boundary tile
-            for (int x = tileX - 1; x <= tileX; x++)
+            for (int x = tileX - 1; x <= tileX + 1; x++)
             {
                 for (int y = tileY; y <= tileY + 1; y++)
                 {
@@ -62,7 +64,10 @@ namespace PokemonGame
                         return true; // Out of bounds
                     }
 
-                    if (boundaries[x, y])
+                    // Check if the player's bounds intersect with the boundary tile
+                    if (position.X + playerWidth >= x * 48 && position.X <= (x + 1) * 48 &&
+                        position.Y + playerHeight >= y * 48 && position.Y <= (y + 1) * 48 &&
+                        boundaries[x, y])
                     {
                         return true; // Collision detected
                     }
