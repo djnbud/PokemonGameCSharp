@@ -197,7 +197,7 @@ namespace PokemonGame
         {
             storyTextPanel.Visible = false;
             //set default start when new character
-            var details = new GameDetails(new Point(1230,850), "PelletTown", true, 3360, 1920);
+            var details = new GameDetails(new Point(1230,900), "PelletTown", true, 70, 40);
             gameInitialize(details);
             LoadGame();
         }

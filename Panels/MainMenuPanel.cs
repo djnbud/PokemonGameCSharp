@@ -42,14 +42,16 @@ namespace PokemonGame.Panels
         {
             originalFormWidth = this.ClientSize.Width;
             originalFormHeight = this.ClientSize.Height;
-            startButton = new ImageButton(Image.FromFile("Assets/button.png"));
-            startButton.Text = "Start New Game";
-            startButton.Size = new Size(150, 50);
-            startButton.HoverImage = Image.FromFile("Assets/hoverButton.png"); // Load image from file
-            startButton.PlainImage = Image.FromFile("Assets/button.png");
-            startButton.PressedImage = Image.FromFile("Assets/hoverButton.png");
-            startButton.Location = new Point(50, 300);
-            startButton.Font = new Font("Arial", 2, FontStyle.Bold);
+            startButton = new ImageButton(Image.FromFile("Assets/button.png"))
+            {
+                Text = "Start New Game",
+                Size = new Size(150, 50),
+                HoverImage = Image.FromFile("Assets/hoverButton.png"), // Load image from file
+                PlainImage = Image.FromFile("Assets/button.png"),
+                PressedImage = Image.FromFile("Assets/hoverButton.png"),
+                Location = new Point(50, 300),
+                Font = new Font("Arial", 2, FontStyle.Bold)
+            };
             startButton.Click += startButton_Click;
             this.Controls.Add(startButton);
 

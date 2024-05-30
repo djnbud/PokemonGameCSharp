@@ -115,6 +115,20 @@ namespace PokemonGame.Panels
                 g.DrawImage(backgroundImage, offsetX, offsetY, backgroundImage.Width, backgroundImage.Height);
             }
 
+            using (var brush = new SolidBrush(Color.Red))
+            {
+                for (int x = 0; x < boundaries.GetLength(0); x++)
+                {
+                    for (int y = 0; y < boundaries.GetLength(1); y++)
+                    {
+                        if (boundaries[x, y])
+                        {
+                            e.Graphics.FillRectangle(brush, offsetX + x * 48, offsetY + y * 48, 48, 48);
+                        }
+                    }
+                }
+            }
+
             // Draw the player
             player.Draw(g, screenCenter);
 
