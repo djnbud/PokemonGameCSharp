@@ -13,7 +13,11 @@ namespace PokemonGame
         public bool MovingLeft { get; set; } = false;
         public bool MovingRight { get; set; } = false;
         public bool IsMoving { get; set; } = false;
-        public Player() : base("Assets/player/player_spritesheet.png", 48, 68, 4, 100) { }
+        private bool[,] boundaries;
+        public Player(bool[,] boundaries) : base("Assets/player/player_spritesheet.png", 48, 68, 4, 100) 
+        { 
+            this.boundaries = boundaries;
+        }
         public void Update()
         {
             Point newPosition = Position;
@@ -23,7 +27,11 @@ namespace PokemonGame
             if (MovingLeft) newPosition.X -= Speed;
             if (MovingRight) newPosition.X += Speed;
 
-            Position = newPosition;
+            // Check for collision
+            if (!IsCollision(newPosition))
+            {
+                Position = newPosition;
+            }
 
             if (!MovingUp && !MovingDown && !MovingLeft && !MovingRight)
             {
@@ -34,6 +42,19 @@ namespace PokemonGame
                 StartAnimation(0);
             }
             UpdateAnimation();
+        }
+
+        private bool IsCollision(Point position)
+        {
+            int tileX = position.X / 48;
+            int tileY = position.Y / 48;
+
+            if (tileX < 0 || tileY < 0 || tileX >= boundaries.GetLength(0) || tileY >= boundaries.GetLength(1))
+            {
+                return true; // Out of bounds
+            }
+
+            return boundaries[tileX, tileY];
         }
 
         public void Draw(Graphics g, Point screenPosition)

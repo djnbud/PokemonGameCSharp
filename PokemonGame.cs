@@ -45,7 +45,7 @@ namespace PokemonGame
             storyInitialize();
             savedGamesInitialize();
             optionsInitialize();
-            gameInitialize();
+            
         }
 
         private void mainMenuInitialize()
@@ -115,9 +115,9 @@ namespace PokemonGame
             this.Controls.Add(optionsPanel);
         }
 
-        private void gameInitialize()
+        private void gameInitialize(GameDetails details)
         {
-            gamePanel = new GamePanel();
+            gamePanel = new GamePanel(details);
             this.Controls.Add(gamePanel);
         }
 
@@ -196,6 +196,9 @@ namespace PokemonGame
         private void StoryTextPanel_StoryCompleted(object sender, EventArgs e)
         {
             storyTextPanel.Visible = false;
+            //set default start when new character
+            var details = new GameDetails(new Point(1230,850), "PelletTown", true, 3360, 1920);
+            gameInitialize(details);
             LoadGame();
         }
 
