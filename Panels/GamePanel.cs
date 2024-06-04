@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
 using Newtonsoft.Json;
+using PokemonGame.Misc;
 
 namespace PokemonGame.Panels
 {
@@ -13,30 +14,38 @@ namespace PokemonGame.Panels
         private Image foregroundImage;
         private Timer gameTimer;
         private Point screenCenter;
-        private bool[,] boundaries;
+        private BoundaryData boundaryData;
+        private CollisionData collisionData;
+        private GameDetails gameDetails;
+        private CollisionManager collisionManager;
         //private DateTime lastAnimationTime;
 
         public GamePanel(GameDetails details)
         {
-            
-       
+            gameDetails = details;
             this.DoubleBuffered = true; // Prevent flickering
-            InitializeGame(details);
+            InitializeGame();
         }
 
-        private void InitializeGame(GameDetails details)
+        private void InitializeGame()
         {
             this.Size = new Size(800, 450); // Adjust size as needed
-            this.BackColor = Color.Green;
-            backgroundImage = Image.FromFile(details.BackgroundImagePath);
-            foregroundImage = Image.FromFile(details.ForegroundImagePath);
+            this.BackColor = Color.Black;
+            LoadBackgroundAndForegroundImages();
 
-             var collisionData = LoadCollisionData(details.CollisionDataPath);
-            boundaries = CreateBoundariesArray(collisionData, details.MapWidth, details.MapHeight, 48, 48);
+            collisionData = LoadCollisionData(gameDetails.CollisionDataPath);
+
+            boundaryData = CreateBoundariesArray(collisionData, gameDetails.MapWidth, gameDetails.MapHeight, 48, 48);
+
+            collisionManager = new CollisionManager(
+                boundaryData,
+                gameDetails,
+                this
+            );
 
             //playerSprite = new Sprite("Assets/player/player_spritesheet.png", 48, 68, 4, 5); // Adjust as needed
-            player = new Player(boundaries);
-            player.Position = new Point(details.PlayerPosition.X, details.PlayerPosition.Y);
+            player = new Player(collisionManager);
+            player.Position = new Point(gameDetails.PlayerPosition.X, gameDetails.PlayerPosition.Y);
 
             screenCenter = new Point((this.Width - player.FrameWidth) / 2, (this.Height - player.FrameHeight) / 2);
 
@@ -46,6 +55,51 @@ namespace PokemonGame.Panels
             gameTimer.Start();
             //lastAnimationTime = DateTime.Now;
 
+        }
+
+        public void Reload(int currentCollisionId)
+        {
+            // Update background and foreground images
+            LoadBackgroundAndForegroundImages();
+
+            // Update collision arrays
+            collisionData = LoadCollisionData(gameDetails.CollisionDataPath);
+            
+
+            boundaryData = CreateBoundariesArray(collisionData, gameDetails.MapWidth, gameDetails.MapHeight, 48, 48);
+            collisionManager = new CollisionManager(boundaryData, gameDetails,
+                this);
+
+            player = new Player(collisionManager);
+            player.Position = collisionManager.newPlayerLocation(currentCollisionId);//new Point(gameDetails.PlayerPosition.X, gameDetails.PlayerPosition.Y);
+
+
+            // Reposition player if necessary
+            //if (gameDetails.Inside)
+            //{
+                // Position player at corresponding outside tile position
+                // Implement logic for corresponding outside tile position
+            //}
+            //else
+            //{
+                // Position player at corresponding inside tile position
+                // Implement logic for corresponding inside tile position
+            //}
+
+            Invalidate(); // Request a redraw of the panel
+        }
+
+        private void LoadBackgroundAndForegroundImages()
+        {
+            if (!string.IsNullOrEmpty(gameDetails.BackgroundImagePath))
+            {
+                backgroundImage = Image.FromFile(gameDetails.BackgroundImagePath);
+            }
+
+            if (!string.IsNullOrEmpty(gameDetails.ForegroundImagePath))
+            {
+                foregroundImage = Image.FromFile(gameDetails.ForegroundImagePath);
+            }
         }
 
         private void GameTimer_Tick(object sender, EventArgs e)
@@ -117,11 +171,25 @@ namespace PokemonGame.Panels
 
             using (var brush = new SolidBrush(Color.Red))
             {
-                for (int x = 0; x < boundaries.GetLength(0); x++)
+                for (int x = 0; x < boundaryData.OutsideInside.GetLength(0); x++)
                 {
-                    for (int y = 0; y < boundaries.GetLength(1); y++)
+                    for (int y = 0; y < boundaryData.OutsideInside.GetLength(1); y++)
                     {
-                        if (boundaries[x, y])
+                        if (boundaryData.OutsideInside[x, y])
+                        {
+                            e.Graphics.FillRectangle(brush, offsetX + x * 48, offsetY + y * 48, 48, 48);
+                        }
+                    }
+                }
+            }
+
+            using (var brush = new SolidBrush(Color.Blue))
+            {
+                for (int x = 0; x < boundaryData.Upstairs.GetLength(0); x++)
+                {
+                    for (int y = 0; y < boundaryData.Upstairs.GetLength(1); y++)
+                    {
+                        if (boundaryData.Upstairs[x, y])
                         {
                             e.Graphics.FillRectangle(brush, offsetX + x * 48, offsetY + y * 48, 48, 48);
                         }
@@ -151,16 +219,29 @@ namespace PokemonGame.Panels
             return JsonConvert.DeserializeObject<CollisionData>(json);
         }
 
-        private bool[,] CreateBoundariesArray(CollisionData collisionData, int mapWidth, int mapHeight, int tileWidth, int tileHeight)
+        private BoundaryData CreateBoundariesArray(CollisionData collisionData, int mapWidth, int mapHeight, int tileWidth, int tileHeight)
         {
+            bool[,] outsideInside = new bool[mapWidth, mapHeight];
             bool[,] boundaries = new bool[mapWidth, mapHeight];
+            bool[,] upstairs = new bool[mapWidth, mapHeight];
+            int[,] collisionId = new int[mapWidth, mapHeight];
             for (int i = 0; i < collisionData.collisions.Length; i++)
             {
                 int x = i % mapWidth;
                 int y = i / mapWidth;
-                boundaries[x, y] = collisionData.collisions[i] == 1025;
+                
+                outsideInside[x, y] = collisionData.collisions[i] > 400 && collisionData.collisions[i] < 500;
+                collisionId[x, y] = collisionData.collisions[i];
+                boundaries[x, y] = collisionData.collisions[i] == 27;
+                upstairs[x, y] = collisionData.collisions[i] > 800 && collisionData.collisions[i] < 900;
+                
             }
-            return boundaries;
+            return new BoundaryData {
+                OutsideInside = outsideInside,
+                CollisionId = collisionId,
+                Boundaries = boundaries,
+                Upstairs = upstairs
+                };
         }
     }
 }

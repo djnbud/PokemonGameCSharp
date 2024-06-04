@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using PokemonGame.Misc;
 
 namespace PokemonGame
 {
@@ -13,10 +14,10 @@ namespace PokemonGame
         public bool MovingLeft { get; set; } = false;
         public bool MovingRight { get; set; } = false;
         public bool IsMoving { get; set; } = false;
-        private bool[,] boundaries;
-        public Player(bool[,] boundaries) : base("Assets/player/player_spritesheet.png", 48, 68, 4, 100) 
+        private CollisionManager collisionManager;
+        public Player(CollisionManager collisionManager) : base("Assets/player/player_spritesheet.png", 48, 68, 4, 100) 
         { 
-            this.boundaries = boundaries;
+            this.collisionManager = collisionManager;
         }
         public void Update()
         {
@@ -28,9 +29,15 @@ namespace PokemonGame
             if (MovingRight) newPosition.X += Speed;
 
             // Check for collision
-            if (!IsCollision(newPosition))
+            if (!collisionManager.IsCollision(newPosition, FrameWidth, FrameHeight))
             {
                 Position = newPosition;
+            }
+
+            // Check for map swap
+            if (collisionManager.IsOutsideInside(newPosition, FrameWidth, FrameHeight))
+            {
+                collisionManager.SwapMap(newPosition, !collisionManager.gameDetails.Inside);
             }
 
             if (!MovingUp && !MovingDown && !MovingLeft && !MovingRight)
@@ -44,40 +51,7 @@ namespace PokemonGame
             UpdateAnimation();
         }
 
-        private bool IsCollision(Point position)
-        {
-            int playerWidth = FrameWidth; // Full width of the player
-            int playerHeight = FrameHeight; // Only consider the bottom half of the player
-            int playerCenterX = position.X + playerWidth / 2; // Center X coordinate of the player
-            int playerCenterY = position.Y + playerHeight / 2;    
-
-            int tileX = playerCenterX / 48;
-            int tileY = playerCenterY / 48;
-
-            // Check if any part of the player's bounds intersects with a boundary tile
-            for (int x = tileX - 1; x <= tileX + 1; x++)
-            {
-                for (int y = tileY; y <= tileY + 1; y++)
-                {
-                    if (x < 0 || y < 0 || x >= boundaries.GetLength(0) || y >= boundaries.GetLength(1))
-                    {
-                        return true; // Out of bounds
-                    }
-
-                    // Check if the player's bounds intersect with the boundary tile
-                    if (position.X + playerWidth >= x * 48 && position.X <= (x + 1) * 48 &&
-                        position.Y + playerHeight >= y * 48 && position.Y <= (y + 1) * 48 &&
-                        boundaries[x, y])
-                    {
-                        return true; // Collision detected
-                    }
-                }
-            }
-
-            return false; // No collision detected
-        }
-
-
+       
         public void Draw(Graphics g, Point screenPosition)
         {
             //int frameWidth = spriteSheet.Width / totalFrames;
